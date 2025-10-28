@@ -72,10 +72,12 @@ class Config implements ConfigInterface
             'operationNames'                 => '',
             'sharedTypes'                    => false,
             'constructorParamsDefaultToNull' => false,
-            'soapClientClass'               => '\SoapClient',
-            'soapClientOptions'             => array(),
-            'proxy'                         => false,
-            'async'                         => false
+            'soapClientClass'                => '\SoapClient',
+            'soapClientOptions'              => array(),
+            'proxy'                          => false,
+            'async'                          => false,
+            'fullTypeHints'                  => false,
+            'promises'                       => false
         ));
 
         // A set of configuration options names and normalizer callables.

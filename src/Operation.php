@@ -79,15 +79,14 @@ class Operation
      * @param Type[] $validTypes An array of Type objects with valid types for typehinting
      * @return string A parameter string
      */
-    public function getParamString(array $validTypes)
+    public function getParamString(array $validTypes, $fullHints)
     {
         $params = array();
 
         foreach ($this->params as $value => $typeHint) {
             $ret = '';
-
             // Array or complex types is valid typehints
-            if ($typeHint == 'array') {
+            if ($typeHint == 'array' || $fullHints) {
                 $ret .= $typeHint . ' ';
             } else {
                 foreach ($validTypes as $type) {

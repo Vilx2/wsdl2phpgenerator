@@ -240,6 +240,9 @@ $generator->generate(
     ))
 ));
 ````
+#### `fullTypeHints`
+
+Boolean, defaults to `false`. Setting to `true` adds full PHP 7.4 type hints, both for parameters and return types.
 
 #### `async`
 
@@ -312,7 +315,7 @@ $generator->generate(
 ```php
 $service = new MySoapService();
 
-$service->operationA(new operationA(), function (operationAResponse $success, $failure) {
+$service->operationAAsync(new operationA(), function (operationAResponse $success, $failure) {
     if ( $success ) {
         echo "Operation A is a success!";
         var_dump($success);
@@ -322,7 +325,7 @@ $service->operationA(new operationA(), function (operationAResponse $success, $f
     }
 });
 
-$service->operationB(new operationB(), function (operationBResponse $success, $failure) {
+$service->operationBAsync(new operationB(), function (operationBResponse $success, $failure) {
     if ( $success ) {
         echo "Operation B is a success!";
         var_dump($success);
@@ -338,6 +341,13 @@ $service->operationB(new operationB(), function (operationBResponse $success, $f
 // When using a custom implementation, there may be a different method.
 $service->__waitForAll();
 ```
+
+#### `promises`
+
+Boolean. Defaults to `false`. If set to `true`, and `async` is also `true`, then the generated class will use GuzzleHtp
+promises instead. Async methods will **NOT** take an extra `$callback` parameter, and instead will return a `Promise`.
+The `__soapCallAsync()` method in the base class must also be changed correspondingly and a reference implementation
+for this is not provided.
 
 ## Versioning
 

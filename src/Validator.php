@@ -4,13 +4,15 @@
  */
 namespace Wsdl2PhpGenerator;
 
+use Transliterator;
+
 /**
  * Class that contains functionality to validate a string as valid php
  * Contains functionf for validating Type, Classname and Naming convention
  *
  * @package Wsdl2PhpGenerator
  * @author Fredrik Wallgren <fredrik.wallgren@gmail.com>
- * @license http://www.opensource.org/licenses/mit-license.php MIT License
+*  * @license http://www.opensource.org/licenses/mit-license.php MIT License
  */
 class Validator
 {
@@ -241,7 +243,7 @@ class Validator
      * @param string $typeName The name of the type to test.
      * @return null|string Returns a valid type hint for the type or null if there is no valid type hint.
      */
-    public static function validateTypeHint($typeName)
+    public static function validateTypeHint($typeName, $fullTypes)
     {
         $typeHint = null;
 
@@ -250,8 +252,8 @@ class Validator
         // strings and not class instances and we have no way of determining whether the type is an enum at this point.
         if (substr($typeName, -2) == "[]") {
             $typeHint = 'array';
-        } elseif ($typeName == '\DateTime') {
-            $typeHint = $typeName;
+        } elseif ($typeName == '\DateTime' || $fullTypes) {
+            $typeHint = ($fullTypes ? '?' : '') . $typeName;
         }
 
         return $typeHint;
@@ -293,7 +295,7 @@ class Validator
      */
     private static function validateNamingConvention($name)
     {
-        $name = iconv("UTF-8", "ASCII//TRANSLIT", $name);
+        $name =  Transliterator::create('Any-Latin; Latin-ASCII')->transliterate($name);
 
         // Prepend the string a to names that begin with anything but a-z This is to make a valid name
         if (preg_match('/^[A-Za-z_]/', $name) == false) {

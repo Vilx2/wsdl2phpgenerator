@@ -168,7 +168,7 @@ class Service implements ClassGenerator
         $source .= '  }' . PHP_EOL;
         $source .= '  parent::__construct($wsdl, $options);' . PHP_EOL;
 
-        $function = new PhpFunction('public', '__construct', 'array $options = array(), $wsdl = null', $source, $comment);
+        $function = new PhpFunction('public', '__construct', 'array $options = array(), '.($this->config->get('fullTypeHints') ? '?string ' : '').'$wsdl = null', $source, $comment);
 
         // Add the constructor
         $this->class->addFunction($function);
@@ -203,9 +203,9 @@ class Service implements ClassGenerator
 
             $source = '  return $this->__soapCall(\'' . $operation->getName() . '\', array(' . $operation->getParamStringNoTypeHints() . '));' . PHP_EOL;
 
-            $paramStr = $operation->getParamString($this->types);
+            $paramStr = $operation->getParamString($this->types, $this->config->get('fullTypeHints'));
 
-            $function = new PhpFunction('public', $name, $paramStr, $source, $comment);
+            $function = new PhpFunction('public', $name, $paramStr, $source, $comment, $this->config->get('fullTypeHints') ? $operation->getReturns() : null);
 
             if ($this->class->functionExists($function->getIdentifier()) == false) {
                 $this->class->addFunction($function);
@@ -219,18 +219,30 @@ class Service implements ClassGenerator
                     $arr = $operation->getPhpDocParams($param, $this->types);
                     $comment->addParam(PhpDocElementFactory::getParam($arr['type'], $arr['name'], $arr['desc']));
                 }
-                $comment->addParam(PhpDocElementFactory::getParam('callable', '$callback',
-                    'Callback that will get called on completion of the operation. Callback parameters: (' . $operation->getReturns() . ' $success, $error)'));
 
-                $source = '  $this->__soapCallAsync(\'' . $operation->getName() . '\', array(' . $operation->getParamStringNoTypeHints() . '), $callback);' . PHP_EOL;
+                if ( $this->config->get('promises')) {
+                    $comment->setReturn(PhpDocElementFactory::getReturn("\\GuzzleHttp\\Promise\\PromiseInterface", ''));
 
-                $paramStr = $operation->getParamString($this->types);
-                if ($paramStr) {
-                    $paramStr .= ', ';
+                    $source = '  return $this->__soapCallAsync(\'' . $operation->getName() . '\', array(' . $operation->getParamStringNoTypeHints() . '));' . PHP_EOL;
+
+                    $paramStr = $operation->getParamString($this->types, $this->config->get('fullTypeHints'));
+
+                    $function = new PhpFunction('public', $name . 'Async', $paramStr, $source, $comment, $this->config->get('fullTypeHints') ? "\\GuzzleHttp\\Promise\\PromiseInterface" : null);
+
+                } else {
+                    $comment->addParam(PhpDocElementFactory::getParam('callable', '$callback',
+                        'Callback that will get called on completion of the operation. Callback parameters: (' . $operation->getReturns() . ' $success, $error)'));
+                    $source = '  $this->__soapCallAsync(\'' . $operation->getName() . '\', array(' . $operation->getParamStringNoTypeHints() . '), $callback);' . PHP_EOL;
+
+                    $paramStr = $operation->getParamString($this->types, $this->config->get('fullTypeHints'));
+                    if ($paramStr) {
+                        $paramStr .= ', ';
+                    }
+                    $paramStr .= 'callable $callback';
+
+                    $function = new PhpFunction('public', $name . 'Async', $paramStr, $source, $comment, $this->config->get('fullTypeHints') ? 'void' : null);
                 }
-                $paramStr .= 'callable $callback';
 
-                $function = new PhpFunction('public', $name . 'Async', $paramStr, $source, $comment);
 
                 if ($this->class->functionExists($function->getIdentifier()) == false) {
                     $this->class->addFunction($function);

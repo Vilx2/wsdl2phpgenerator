@@ -90,7 +90,7 @@ class ComplexType extends Type
 
                 if (!$member->getNullable()) {
                     $constructorComment->addParam(PhpDocElementFactory::getParam($type, $name, ''));
-                    $constructorParameters[$name] = Validator::validateTypeHint($type);
+                    $constructorParameters[$name] = Validator::validateTypeHint($type, $this->config->get('fullTypeHints'));
                 }
             }
             $constructorSource .= '  parent::__construct(' . $this->buildParametersString($constructorParameters, false) . ');' . PHP_EOL;
@@ -100,7 +100,7 @@ class ComplexType extends Type
         foreach ($this->members as $member) {
             $type = Validator::validateType($member->getType());
             $name = Validator::validateAttribute($member->getName());
-            $typeHint = Validator::validateTypeHint($type);
+            $typeHint = Validator::validateTypeHint($type, $this->config->get('fullTypeHints'));
 
             $comment = new PhpDocComment();
             $comment->setVar(PhpDocElementFactory::getVar($type, $name, ''));
@@ -136,7 +136,7 @@ class ComplexType extends Type
             } else {
                 $getterCode = '  return $this->' . $name . ';' . PHP_EOL;
             }
-            $getter = new PhpFunction('public', 'get' . ucfirst($name), '', $getterCode, $getterComment);
+            $getter = new PhpFunction('public', 'get' . ucfirst($name), '', $getterCode, $getterComment, $this->config->get('fullTypeHints') ? '?' . $type : null );
             $accessors[] = $getter;
 
             $setterComment = new PhpDocComment();
@@ -168,7 +168,8 @@ class ComplexType extends Type
                     $member->getNullable() && !empty($typeHint)
                 ),
                 $setterCode,
-                $setterComment
+                $setterComment,
+                $this->config->get('fullTypeHints') ? 'self' : null
             );
             $accessors[] = $setter;
         }
