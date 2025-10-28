@@ -57,6 +57,8 @@ class PhpFunction extends PhpElement
         if ( $returnType ) {
             if (substr($returnType, -2) == '[]') {
                 $this->returnType = $returnType[0] == '?' ? '?array' : 'array';
+            } else {
+                $this->returnType = $returnType;
             }
         } else {
             $this->returnType = null;
