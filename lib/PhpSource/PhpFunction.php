@@ -53,7 +53,14 @@ class PhpFunction extends PhpElement
         $this->params = $params;
         $this->source = $source;
         $this->comment = $comment;
-        $this->returnType = $returnType;
+
+        if ( $returnType ) {
+            if (substr($returnType, -2) == '[]') {
+                $this->returnType = $returnType[0] == '?' ? '?array' : 'array';
+            }
+        } else {
+            $this->returnType = null;
+        }
     }
 
     /**
