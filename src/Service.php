@@ -205,7 +205,7 @@ class Service implements ClassGenerator
 
             $paramStr = $operation->getParamString($this->types, $this->config->get('fullTypeHints'));
 
-            $function = new PhpFunction('public', $name, $paramStr, $source, $comment, $this->config->get('fullTypeHints') ? $operation->getReturns() : null);
+            $function = new PhpFunction('public', $name, $paramStr, $source, $comment, $this->config->get('fullTypeHints') ? Validator::validateType($operation->getReturns()) : null);
 
             if ($this->class->functionExists($function->getIdentifier()) == false) {
                 $this->class->addFunction($function);

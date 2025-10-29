@@ -130,7 +130,7 @@ class Operation
             }
         }
 
-        $ret['type'] = $paramType;
+        $ret['type'] = Validator::validateType($paramType);
 
         foreach ($validTypes as $type) {
             if ($paramType == $type->getIdentifier()) {
