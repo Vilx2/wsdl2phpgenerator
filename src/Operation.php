@@ -86,8 +86,10 @@ class Operation
         foreach ($this->params as $value => $typeHint) {
             $ret = '';
             // Array or complex types is valid typehints
-            if ($typeHint == 'array' || $fullHints) {
+            if ($typeHint == 'array' ) {
                 $ret .= $typeHint . ' ';
+            } else if ( $fullHints ) {
+                $ret .= Validator::validateType($typeHint) . ' ';
             } else {
                 foreach ($validTypes as $type) {
                     if ($type instanceof ComplexType) {
