@@ -209,22 +209,20 @@ class Validator
             case "unsignedlong":
             case "unsignedshort":
                 return 'int';
-                break;
             case "float":
             case "double":
             case "decimal":
                 return 'float';
-                break;
             case "<anyxml>":
             case "string":
             case "token":
             case "normalizedstring":
             case "hexbinary":
                 return 'string';
-                break;
             case "datetime":
                 return  '\DateTime';
-                break;
+            case "boolean":
+                return 'bool';
             default:
                 $typeName = self::validateNamingConvention($typeName);
                 break;
