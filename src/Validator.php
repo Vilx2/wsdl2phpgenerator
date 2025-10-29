@@ -218,6 +218,7 @@ class Validator
             case "token":
             case "normalizedstring":
             case "hexbinary":
+            case "date":
                 return 'string';
             case "datetime":
                 return  '\DateTime';
